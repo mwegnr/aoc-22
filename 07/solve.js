@@ -1,5 +1,3 @@
-const { match } = require("assert");
-
 function readInput(testInput = false, asStringList = false) {
   const fs = require("fs");
   const inputfile = testInput ? "testinput.txt" : "input.txt";
