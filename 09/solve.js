@@ -1,5 +1,9 @@
 const util = require("../util");
 
+function equalsPos(element) {
+  return element.x == this.x && element.y == this.y;
+}
+
 function eucledianDistance(p, q) {
   return Math.sqrt(Math.pow(q.x - p.x, 2) + Math.pow(q.y - p.y, 2));
 }
@@ -12,23 +16,38 @@ function readInstructionsFromInput(input) {
     }
   });
 }
-
-function moveTailToHead(tailPosition, headPosition, previousHeadPosition) {
+function moveKnotsList(headPosition, ropePositions) {
   // move tail to previous head position if eucledian distance is 2 or bigger
+  const tailPosition = ropePositions[ropePositions.length - 1];
+
   if (eucledianDistance(tailPosition, headPosition) >= 2) {
-    return previousHeadPosition;
+    ropePositions.pop();
+    return [{ ...headPosition }, ...ropePositions];
   }
-  return tailPosition;
+  return [{ ...headPosition }, { ...tailPosition }];
+}
+
+function moveKnots(headPosition, ropePositions) {
+  // move tail to previous head position if eucledian distance is 2 or bigger
+  const tailPosition = ropePositions[ropePositions.length - 1];
+
+  if (eucledianDistance(tailPosition, headPosition) >= 2) {
+    ropePositions.pop();
+    return [{ ...headPosition }, ...ropePositions];
+  }
+  return [{ ...headPosition }, { ...tailPosition }];
 }
 
 // simulates moves and returns visited points afterwards
-function moveRopeEnds(instructions) {
+function moveRopeEnds(instructions, knots = 2) {
   let headPosition = { x: 0, y: 0 };
-  let tailPosition = { x: 0, y: 0 };
-  const visitedPositions = [{ ...tailPosition }];
+  let ropePositions = Array.from({ length: knots }, (e) => {
+    return { ...headPosition };
+  });
+
+  const visitedPositions = [{ ...ropePositions[ropePositions.length - 1] }];
   instructions.forEach((move) => {
     for (let i = 0; i < move.steps; i++) {
-      const previousHeadPosition = { ...headPosition };
       switch (move.dir) {
         case "U":
           headPosition.y--;
@@ -43,8 +62,8 @@ function moveRopeEnds(instructions) {
           headPosition.x--;
           break;
       }
-      tailPosition = moveTailToHead(tailPosition, headPosition, previousHeadPosition);
-      visitedPositions.push({ ...tailPosition });
+      ropePositions = moveKnots(headPosition, ropePositions);
+      visitedPositions.push({ ...ropePositions[ropePositions.length - 1] });
     }
   });
   return visitedPositions;
@@ -56,10 +75,6 @@ const input = util.readInput(testrun, inputAsStringList);
 const instructions = readInstructionsFromInput(input);
 const visitedPositions = moveRopeEnds(instructions);
 
-function equalsPos(element) {
-  return element.x == this.x && element.y == this.y;
-}
-
 console.log(
   visitedPositions.reduce((total, current, index) => {
     if (visitedPositions.findIndex(equalsPos, current) == index) {
@@ -68,6 +83,5 @@ console.log(
     return total;
   }, 0)
 );
-
 
 // Part 2
