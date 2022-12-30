@@ -8,5 +8,9 @@ module.exports = {
             return input.split("\n");
         }
         return input;
+    },
+    round: function(v) {
+        // custom rounding because JS rounds negative values the wrong way 
+        return (v >= 0 || -1) * Math.round(Math.abs(v));
     }
 }
