@@ -11,6 +11,7 @@ function readInstructionsFromInput(input) {
   });
 }
 
+// Part 1
 function simulateRegisterContent(instructions) {
   let registerContentPerCycle = [1];
   instructions.forEach((instruction) => {
@@ -27,9 +28,32 @@ function simulateRegisterContent(instructions) {
 }
 
 function calculateSignalStrength(registerContentPerCycle) {
-  const cycles = [];
-  for (let i = 20; i <= 220; i += 40) cycles.push(i);
-  return cycles.map((cycle) => cycle * registerContentPerCycle[cycle - 1]).reduce((total, current) => total + current);
+  return util
+    .range(20, 221, 40)
+    .map((cycle) => cycle * registerContentPerCycle[cycle - 1])
+    .reduce((total, current) => total + current);
+}
+
+// Part 2
+
+function getPixelContent(currentPosition, registerContent) {
+  if ([registerContent - 1, registerContent, registerContent + 1].includes(currentPosition)) {
+    return "#";
+  }
+  return ".";
+}
+
+function draw(registerContentPerCycle) {
+  const lines = util.range(0, 6);
+  return lines.map((lineNr) => {
+    return util
+      .range(0, 40)
+      .map((charIndex) => {
+        let registerIndex = lineNr * 40 + charIndex;
+        return getPixelContent(charIndex, registerContentPerCycle[registerIndex]);
+      })
+      .join("");
+  });
 }
 
 const [testrun, inputAsStringList] = [false, true];
@@ -37,9 +61,8 @@ const input = util.readInput(testrun, inputAsStringList);
 
 const instructions = readInstructionsFromInput(input);
 
-// Part 1
 const registerContentPerCycle = simulateRegisterContent(instructions);
-console.log(calculateSignalStrength(registerContentPerCycle));
+// console.log(calculateSignalStrength(registerContentPerCycle));
 
 // console.log(registerContentPerCycle[20 - 1] == 21);
 // console.log(registerContentPerCycle[60 - 1] == 19);
@@ -50,4 +73,15 @@ console.log(calculateSignalStrength(registerContentPerCycle));
 
 // console.log(calculateSignalStrength(registerContentPerCycle) == 13140);
 
-// Part 2
+const crtImage = draw(registerContentPerCycle);
+console.log(crtImage);
+
+// console.log(getPixelContent(0, 1) == "#");
+// console.log(getPixelContent(2, 16) == ".");
+
+// console.log(crtImage[0] == "##..##..##..##..##..##..##..##..##..##..")
+// console.log(crtImage[1] == "###...###...###...###...###...###...###.")
+// console.log(crtImage[2] == "####....####....####....####....####....")
+// console.log(crtImage[3] == "#####.....#####.....#####.....#####.....")
+// console.log(crtImage[4] == "######......######......######......####")
+// console.log(crtImage[5] == "#######.......#######.......#######.....")
